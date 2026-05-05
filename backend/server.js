@@ -41,6 +41,6 @@ app.post("/login", (req, res) => {
 });
 
 // 🚀 SERVER
-app.listen(3000, () => {
-  console.log("API çalışıyor: http://localhost:3000");
+app.listen(process.env.PORT || 3000, () => {
+  console.log("API çalışıyor");
 });

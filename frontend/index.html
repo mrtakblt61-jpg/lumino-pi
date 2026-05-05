@@ -15,7 +15,7 @@
 <script>
 
 // 🔗 BACKEND BAĞLANTI
-const API = "http://localhost:3000";
+const API = "https://lumino-pi.onrender.com";
 
 // 📦 içerikleri çek
 async function loadContent() {
@@ -64,7 +64,11 @@ async function unlock(id) {
 <div id="user"></div>
 
 <script>
-Pi.init({ version: "2.0" });
+Pi.init({
+  version: "2.0",
+  sandbox: true,
+  appId: "BURAYA_APP_ID"
+});
 
 let user = null;
 
