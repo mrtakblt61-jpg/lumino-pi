@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lumino Pi</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+
+<body>
+
+<h2>Lumino.pi MVP</h2>
+
+<button onclick="login()">Pi Login</button>
+<button onclick="loadContent()">İçerikleri Getir</button>
+
+<div id="user"></div>
+<div id="content"></div>
+
+<script>
+Pi.init({ version: "2.0" });
+
+let auth = null;
+
+// 🔐 LOGIN
+async function login() {
+  auth = await Pi.authenticate(
+    ["username", "payments"],
+    () => {}
+  );
+
+  document.getElementById("user").innerText =
+    "User: " + auth.user.username;
+}
+
+// 📦 CONTENT GET
+async function loadContent() {
+  const res = await fetch("http://localhost:3000/content");
+  const data = await res.json();
+
+  let html = "";
+
+  data.forEach(item => {
+    html += `
+      <p>
+        ${item.title}
+        ${item.premium ? `<button onclick="unlock(${item.id})">Pi ile Aç</button>` : ""}
+      </p>
+    `;
+  });
+
+  document.getElementById("content").innerHTML = html;
+}
+
+// 💳 UNLOCK (şimdilik basit)
+async function unlock(id) {
+  const payment = await Pi.createPayment({
+    amount: 1,
+    memo: "Lumino unlock",
+    metadata: { contentId: id }
+  });
+
+  alert("Ödeme başlatıldı");
+
+  await fetch("http://localhost:3000/unlock", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      paymentId: payment.identifier,
+      contentId: id
+    })
+  });
+}
+</script>
+
+</body>
+</html>

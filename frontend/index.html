@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lumino.pi</title>
+</head>
+
+<body>
+
+<h2>Lumino.pi MVP</h2>
+
+<button onclick="loadContent()">İçerikleri Yükle</button>
+
+<div id="content"></div>
+
+<script>
+
+// 🔗 BACKEND BAĞLANTI
+const API = "http://localhost:3000";
+
+// 📦 içerikleri çek
+async function loadContent() {
+  const res = await fetch(API + "/content");
+  const data = await res.json();
+
+  let html = "";
+
+  data.forEach(item => {
+    html += `
+      <div style="margin:10px;padding:10px;border:1px solid #ccc">
+        <b>${item.title}</b>
+        <br/>
+
+        ${item.premium
+          ? `<button onclick="unlock(${item.id})">Pi ile Aç</button>`
+          : "Ücretsiz"}
+      </div>
+    `;
+  });
+
+  document.getElementById("content").innerHTML = html;
+}
+
+// 💳 unlock (şimdilik backend’e gönderiyoruz)
+async function unlock(id) {
+  const res = await fetch(API + "/unlock", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      paymentId: "test-payment",
+      contentId: id
+    })
+  });
+
+  const data = await res.json();
+  alert("Açıldı: " + JSON.stringify(data));
+}
+
+</script>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<button onclick="login()">Pi Login</button>
+
+<div id="user"></div>
+
+<script>
+Pi.init({ version: "2.0" });
+
+let user = null;
+
+// 🔐 LOGIN
+async function login() {
+console.log("buton basıldı");
+  try {
+    const scopes = ["username", "payments"];
+
+    const auth = await Pi.authenticate(scopes, () => {});
+
+    user = auth.user;
+
+    document.getElementById("user").innerHTML =
+      "👤 " + user.username;
+
+    // backend'e bildir
+    await fetch("http://localhost:3000/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        uid: user.uid,
+        username: user.username
+      })
+    });
+
+  } catch (e) {
+    console.log("Login hata:", e);
+  }
+}
+</script>
+
+</body>
+</html>
