@@ -67,7 +67,6 @@ async function unlock(id) {
 Pi.init({
   version: "2.0",
   sandbox: true,
-  appId: "BURAYA_APP_ID"
 });
 
 window.addEventListener("load", () => {
@@ -78,16 +77,28 @@ let user = null;
 
 // 🔐 LOGIN
 async function login() {
-console.log("buton basıldı");
+  console.log("buton basıldı");
+
   try {
     const scopes = ["username", "payments"];
 
-    const auth = await Pi.authenticate(scopes, () => {});
+    console.log("authenticate başlıyor");
+
+    const auth = await Pi.authenticate(scopes, (payment) => {
+      console.log("payment callback:", payment);
+    });
+
+    console.log("auth geldi:", auth);
 
     user = auth.user;
 
     document.getElementById("user").innerHTML =
       "👤 " + user.username;
+
+  } catch (e) {
+    console.log("LOGIN HATA:", e);
+  }
+}
 
     // backend'e bildir
     await fetch("https://lumino-pi.onrender.com/login", {
