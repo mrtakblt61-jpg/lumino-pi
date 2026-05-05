@@ -70,6 +70,10 @@ Pi.init({
   appId: "BURAYA_APP_ID"
 });
 
+window.addEventListener("load", () => {
+  console.log("Pi SDK hazır");
+});
+
 let user = null;
 
 // 🔐 LOGIN
@@ -86,7 +90,7 @@ console.log("buton basıldı");
       "👤 " + user.username;
 
     // backend'e bildir
-    await fetch("http://localhost:3000/login", {
+    await fetch("https://lumino-pi.onrender.com/login", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
